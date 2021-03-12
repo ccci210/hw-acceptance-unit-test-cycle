@@ -1,17 +1,60 @@
 class MoviesController < ApplicationController
-
+  
+  
+  
   def show
     id = params[:id] # retrieve movie ID from URI route
     @movie = Movie.find(id) # look up movie by unique ID
     # will render app/views/movies/show.<extension> by default
   end
 
+ 
+  
   def index
+    # todo reset session
     @movies = Movie.all
-  end
+    @all_ratings = ['G', 'PG', 'PG-13','R']
+    @ratings_to_show =  {}
+    @all_ratings_hash= {'G'=>1, 'PG'=>1, 'PG-13'=>1, 'R'=>1}
+    
+    puts params[:ratings]
+    @sort = params[:sort] || session[:sort]
+    @ratings_to_show = params[:ratings] || session[:ratings] || @all_ratings_hash
+    # check selected header
+    if params[:sort] == 'title'
+      @sort='title'
+      # @ratings_to_show = params[:ratings] || session[:ratings] || @all_ratings_hash
+      @title_h='hilite'
+      @movies = Movie.where({rating: @ratings_to_show.keys}).order('title')
+      session[:sort]=params[:sort]
+    end
+    if params[:sort] == 'release_date'
+      @sort='release_date'
+      @release_h='hilite'
+      @movies = Movie.where({rating: @ratings_to_show.keys}).order('release_date') #Movie.order('release_date')
+      session[:sort]=params[:sort]
+    end
+        #@movies = Movie.where({rating: @ratings_to_show.keys}).order('release_date')
+    if params[:sort] != session[:sort] or params[:ratings] != session[:ratings]
+      session[:sort] = @sort
+      session[:ratings] =@ratings_to_show
+      puts "red"
+      puts @sort
+      puts @ratings_to_show
+      redirect_to :sort => @sort, :ratings => @ratings_to_show and return
+    end
+   
+  if params[:ratings]
+      @ratings_to_show = params[:ratings] #check selected rating
+      puts "here"
+      puts @ratings_to_show.keys
+      @movies = Movie.where({rating: @ratings_to_show.keys}).order(@sort)
+      session[:ratings] = @ratings_to_show
+  end 
 
+  end
   def new
-    # default: render 'new' template
+     # default: render 'new' template
   end
 
   def create
@@ -42,6 +85,6 @@ class MoviesController < ApplicationController
   # Making "internal" methods private is not required, but is a common practice.
   # This helps make clear which methods respond to requests, and which ones do not.
   def movie_params
-    params.require(:movie).permit(:title, :rating, :description, :release_date)
+    params.require(:movie).permit(:title, :rating, :description, :release_date, :director)
   end
 end
