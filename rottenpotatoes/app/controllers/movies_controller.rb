@@ -1,6 +1,5 @@
 class MoviesController < ApplicationController
-  
-  
+
   
   def show
     id = params[:id] # retrieve movie ID from URI route
@@ -80,7 +79,30 @@ class MoviesController < ApplicationController
     flash[:notice] = "Movie '#{@movie.title}' deleted."
     redirect_to movies_path
   end
+  
+  def search
+    @movie_id = params[:id]
+    @movie = Movie.where(id:params[:id])
+    @director =  @movie.pluck(:director)[0]
+    puts @director
+    
+    if @director.blank? or @director.nil?
+        @movies=nil
+        puts @movies.nil?
+      else
+        @movies =  Movie.where(director: @director).pluck(:title)  
+      end
+    puts @movies
+    
+    if @movies.nil?
+        @m=Movie.where(id:params[:id])
+        redirect_to movies_path
+        flash[:notice]= " '#{@m.pluck(:title)[0]}' has no director info"
+    end
+   
+  end
 
+  
   private
   # Making "internal" methods private is not required, but is a common practice.
   # This helps make clear which methods respond to requests, and which ones do not.

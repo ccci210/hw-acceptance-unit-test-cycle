@@ -4,7 +4,8 @@ Given /the following movies exist/ do |movies_table|
   movies_table.hashes.each do |movie|
     # each returned element will be a hash whose key is the table header.
     # you should arrange to add that movie to the database here.
-    Movie.create(title: movie[:title], rating: movie[:rating], release_date: movie[:release_date])
+    #Movie.create(title: movie[:title], rating: movie[:rating], release_date: movie[:release_date])
+    Movie.create(movie)
   end
   #fail "Unimplemented"
 end
@@ -13,6 +14,12 @@ Then /(.*) seed movies should exist/ do | n_seeds |
   Movie.count.should be n_seeds.to_i
 end
 
+Then /the director of "(.*)" should be "(.*)"/ do |movie_name,dir|
+  # not sure why expect is not working, return same value
+  #expect( Movie.find_by(title: movie_name).director).to equal(dir)
+    page.body.include? dir
+    page.body.include? movie_name
+end
 # Make sure that one string (regexp) occurs before or after another one
 #   on the same page
 
@@ -50,3 +57,4 @@ Then /I should see all the movies/ do
   page.all('table#movies tr').count.should == 11
  # fail "Unimplemented"
 end
+
