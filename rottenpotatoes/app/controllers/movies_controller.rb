@@ -84,15 +84,15 @@ class MoviesController < ApplicationController
     @movie_id = params[:id]
     @movie = Movie.where(id:params[:id])
     @director =  @movie.pluck(:director)[0]
-    puts @director
+    #puts @director
     
     if @director.blank? or @director.nil?
         @movies=nil
-        puts @movies.nil?
+        #puts @movies.nil?
       else
         @movies =  Movie.where(director: @director).pluck(:title)  
       end
-    puts @movies
+    #puts @movies
     
     if @movies.nil?
         @m=Movie.where(id:params[:id])
