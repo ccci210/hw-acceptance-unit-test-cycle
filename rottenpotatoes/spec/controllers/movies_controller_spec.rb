@@ -15,7 +15,9 @@ RSpec.describe MoviesController do
       response.should render_template(:new)
     end
     it 'create new movie' do 
+      before_count = Movie.count
       post :create, {:movie => movie.attributes}
+      expect(Movie.count).not_to eq(before_count)
       # expect()
     end
   end
